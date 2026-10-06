@@ -46,6 +46,25 @@ select {
   color: inherit;
 }
 
+/*
+  Learn More is the one control whose label is Gray 50 on a Gray 950
+  fill. The unlayered button color above beats layered text utilities,
+  and Tailwind hover utilities only apply inside @media (hover: hover).
+  This rule is more specific than the button color rule and uses a
+  plain :hover selector, so the outlined state wins without !important.
+*/
+button.learn-more {
+  border: 1px solid transparent;
+  background-color: var(--color-gray-950);
+  color: var(--color-gray-50);
+}
+
+button.learn-more:hover {
+  border-color: var(--color-gray-950);
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-950);
+}
+
 :focus-visible {
   outline: 2px solid var(--color-gray-950);
   outline-offset: 3px;

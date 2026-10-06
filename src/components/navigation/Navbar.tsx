@@ -66,13 +66,14 @@ export default function Navbar() {
       surface === "desktop"
         ? `${entry.id}-dropdown`
         : `mobile-${entry.id}-dropdown`;
+    const panelVisible = expanded && (surface === "mobile" || !mobileOpen);
 
     return (
       <button
         type="button"
         className={triggerClass}
         aria-expanded={expanded}
-        aria-controls={panelId}
+        aria-controls={panelVisible ? panelId : undefined}
         onClick={toggle}
       >
         {entry.label}
@@ -212,7 +213,10 @@ export default function Navbar() {
             className="fixed inset-0 z-40 bg-gray-950/75"
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 right-0 z-50 flex w-[64%] flex-col bg-white p-6">
+          <nav
+            aria-label="Primary navigation"
+            className="fixed inset-y-0 right-0 z-50 flex w-[64%] flex-col bg-white p-6"
+          >
             <button
               type="button"
               className="self-end"
@@ -260,7 +264,7 @@ export default function Navbar() {
                   </span>
                 ))}
             </div>
-          </div>
+          </nav>
         </>
       ) : null}
     </>

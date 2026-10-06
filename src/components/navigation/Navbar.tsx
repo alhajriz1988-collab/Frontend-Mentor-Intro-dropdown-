@@ -1,9 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { navigation } from "../../data/navigation";
-import type { NavEntry } from "../../types/navigation";
+import type {
+  DropdownItem,
+  NavEntry,
+  PictorialIcon,
+} from "../../types/navigation";
 
 const chevronWidth = 10;
 const chevronHeight = 6;
@@ -12,19 +16,54 @@ const menuIconHeight = 18;
 const closeIconWidth = 26;
 const closeIconHeight = 26;
 
+const dropdownIconSize: Record<
+  PictorialIcon,
+  { width: number; height: number }
+> = {
+  "/icons/icon-checklist.png": { width: 14, height: 16 },
+  "/icons/icon-calendar.png": { width: 32, height: 32 },
+  "/icons/icon-bell.png": { width: 13, height: 17 },
+  "/icons/icon-clock.png": { width: 16, height: 16 },
+};
+
 const textClass = "font-medium text-gray-500";
 const outlineClass =
   "rounded-full border border-gray-950 px-5 py-2 font-medium text-gray-950";
 const triggerClass = "flex items-center gap-2 font-medium text-gray-500";
+const desktopPanelClass =
+  "absolute top-full z-30 mt-3 flex min-w-max flex-col gap-4 rounded-[10px] bg-white p-6 shadow-[0_10px_20px_rgb(20_20_20/0.12)]";
+const mobilePanelClass = "ml-6 flex flex-col items-start gap-4";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [companyOpen, setCompanyOpen] = useState(false);
+  const [desktopOffsets, setDesktopOffsets] = useState({
+    features: 0,
+    company: 0,
+  });
+  const featuresRef = useRef<HTMLSpanElement>(null);
+  const companyRef = useRef<HTMLSpanElement>(null);
 
   const firstAccountIndex = navigation.entries.findIndex(
     (entry) => entry.group === "account",
   );
+
+  useLayoutEffect(() => {
+    function measure() {
+      const features = featuresRef.current?.offsetLeft ?? 0;
+      const company = companyRef.current?.offsetLeft ?? 0;
+      setDesktopOffsets((current) =>
+        current.features === features && current.company === company
+          ? current
+          : { features, company },
+      );
+    }
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [featuresOpen, companyOpen]);
 
   function toggleFeatures() {
     setFeaturesOpen((open) => !open);
@@ -34,15 +73,27 @@ export default function Navbar() {
     setCompanyOpen((open) => !open);
   }
 
-  function renderTrigger(entry: Extract<NavEntry, { kind: "dropdown" }>) {
-    const expanded = entry.id === "features" ? featuresOpen : companyOpen;
+  function isExpanded(entry: Extract<NavEntry, { kind: "dropdown" }>) {
+    return entry.id === "features" ? featuresOpen : companyOpen;
+  }
+
+  function renderTrigger(
+    entry: Extract<NavEntry, { kind: "dropdown" }>,
+    surface: "desktop" | "mobile",
+  ) {
+    const expanded = isExpanded(entry);
     const toggle = entry.id === "features" ? toggleFeatures : toggleCompany;
+    const panelId =
+      surface === "desktop"
+        ? `${entry.id}-dropdown`
+        : `mobile-${entry.id}-dropdown`;
 
     return (
       <button
         type="button"
         className={triggerClass}
         aria-expanded={expanded}
+        aria-controls={panelId}
         onClick={toggle}
       >
         {entry.label}
@@ -57,6 +108,63 @@ export default function Navbar() {
           height={chevronHeight}
         />
       </button>
+    );
+  }
+
+  function renderDropdownItem(item: DropdownItem) {
+    const icon = "icon" in item ? item.icon : null;
+
+    return (
+      <button
+        type="button"
+        className="flex items-center gap-4 whitespace-nowrap text-left font-medium text-gray-500"
+      >
+        {icon ? (
+          <Image
+            src={icon}
+            alt=""
+            width={dropdownIconSize[icon].width}
+            height={dropdownIconSize[icon].height}
+            className={
+              icon === "/icons/icon-calendar.png" ? "-mx-[7px] -my-2" : undefined
+            }
+          />
+        ) : null}
+        {item.label}
+      </button>
+    );
+  }
+
+  function renderDropdownPanel(
+    entry: Extract<NavEntry, { kind: "dropdown" }>,
+    surface: "desktop" | "mobile",
+  ) {
+    if (!isExpanded(entry)) {
+      return null;
+    }
+
+    const desktop = surface === "desktop";
+
+    return (
+      <ul
+        key={entry.id}
+        id={desktop ? `${entry.id}-dropdown` : `mobile-${entry.id}-dropdown`}
+        className={desktop ? desktopPanelClass : mobilePanelClass}
+        style={
+          desktop
+            ? {
+                left:
+                  entry.id === "features"
+                    ? desktopOffsets.features
+                    : desktopOffsets.company,
+              }
+            : undefined
+        }
+      >
+        {entry.items.map((item) => (
+          <li key={item.label}>{renderDropdownItem(item)}</li>
+        ))}
+      </ul>
     );
   }
 
@@ -81,18 +189,22 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="flex min-w-0 flex-1 items-center gap-8">
+      <div className="relative flex min-w-0 flex-1 items-center gap-8">
         <nav
           aria-label="Primary navigation"
-          className="flex min-w-0 flex-1 items-center gap-8 overflow-hidden"
+          className="flex min-w-0 flex-1 items-center gap-24 overflow-hidden"
         >
           {navigation.entries.map((entry, index) => {
             const accountOffset = index === firstAccountIndex ? "ml-auto" : "";
 
             if (entry.kind === "dropdown") {
               return (
-                <span key={entry.id} className={accountOffset}>
-                  {renderTrigger(entry)}
+                <span
+                  key={entry.id}
+                  ref={entry.id === "features" ? featuresRef : companyRef}
+                  className={accountOffset}
+                >
+                  {renderTrigger(entry, "desktop")}
                 </span>
               );
             }
@@ -104,6 +216,13 @@ export default function Navbar() {
             );
           })}
         </nav>
+        {mobileOpen
+          ? null
+          : navigation.entries.map((entry) =>
+              entry.kind === "dropdown"
+                ? renderDropdownPanel(entry, "desktop")
+                : null,
+            )}
         {mobileOpen ? null : (
           <button
             type="button"
@@ -146,7 +265,13 @@ export default function Navbar() {
                 .filter((entry) => entry.group === "primary")
                 .map((entry) =>
                   entry.kind === "dropdown" ? (
-                    <span key={entry.id}>{renderTrigger(entry)}</span>
+                    <div
+                      key={entry.id}
+                      className="flex flex-col items-start gap-4"
+                    >
+                      {renderTrigger(entry, "mobile")}
+                      {renderDropdownPanel(entry, "mobile")}
+                    </div>
                   ) : (
                     <span key={entry.label}>{renderAction(entry)}</span>
                   ),

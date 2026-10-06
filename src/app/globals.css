@@ -5,14 +5,15 @@
   built CSS even before a component uses them. These names match
   Tailwind's gray and weight variables, so the utilities read the
   approved values instead of Tailwind's default palette.
-  Epilogue is named here. Loading the font file is a later task.
+  --font-family-primary uses the family next/font assigns to
+  --font-epilogue. The color tokens are unchanged.
 */
 :root {
   --color-gray-50: hsl(0, 0%, 98%);
   --color-gray-500: hsl(0, 0%, 41%);
   --color-gray-950: hsl(0, 0%, 8%);
 
-  --font-family-primary: "Epilogue", sans-serif;
+  --font-family-primary: var(--font-epilogue), sans-serif;
 
   --font-weight-medium: 500;
   --font-weight-bold: 700;

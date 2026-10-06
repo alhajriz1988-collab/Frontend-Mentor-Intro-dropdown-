@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+/*
+  Approved style-guide tokens. Declared on :root so they stay in the
+  built CSS even before a component uses them. These names match
+  Tailwind's gray and weight variables, so the utilities read the
+  approved values instead of Tailwind's default palette.
+  Epilogue is named here. Loading the font file is a later task.
+*/
+:root {
+  --color-gray-50: hsl(0, 0%, 98%);
+  --color-gray-500: hsl(0, 0%, 41%);
+  --color-gray-950: hsl(0, 0%, 8%);
+
+  --font-family-primary: "Epilogue", sans-serif;
+
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  --font-size-body: 18px;
+}
+
+@theme inline {
+  --font-sans: var(--font-family-primary);
+}
+
+/*
+  Tailwind preflight already sets border-box, clears default margins
+  and padding, and makes buttons and inputs inherit font and color.
+*/
+body {
+  margin: 0;
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-950);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gray-950);
+  outline-offset: 3px;
+}

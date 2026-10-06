@@ -24,7 +24,7 @@ export default function Hero() {
         width={hero.mobileImage.width}
         height={hero.mobileImage.height}
         priority
-        className="hidden h-[640px] w-[480px] min-[904px]:absolute min-[904px]:top-[46px] min-[904px]:right-[128px] min-[904px]:block"
+        className="hidden h-auto w-[min(480px,calc(100%-746px))] aspect-[3/4] min-[904px]:absolute min-[904px]:top-[46px] min-[904px]:right-[clamp(24px,calc(100%-1202px),128px)] min-[904px]:block"
       />
       <Image
         src={hero.desktopImage.src}

@@ -43,8 +43,7 @@ export default function Hero() {
         </p>
         <button
           type="button"
-          className="mt-7 inline-flex h-12 items-center justify-center rounded-full bg-gray-950 px-4 text-lg font-bold min-[904px]:mt-[3.25rem] min-[904px]:h-14 min-[904px]:px-7"
-          style={{ color: "var(--color-gray-50)" }}
+          className="mt-7 inline-flex h-12 items-center justify-center rounded-full border border-gray-950 bg-gray-950 px-4 text-lg font-bold !text-gray-50 hover:bg-gray-50 hover:!text-gray-950 min-[904px]:mt-[3.25rem] min-[904px]:h-14 min-[904px]:px-7"
         >
           {hero.learnMoreLabel}
         </button>

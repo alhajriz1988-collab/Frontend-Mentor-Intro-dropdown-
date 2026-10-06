@@ -81,27 +81,29 @@ export default function Navbar() {
 
   return (
     <>
-      <nav
-        aria-label="Primary navigation"
-        className="flex min-w-0 flex-1 items-center gap-8"
-      >
-        {navigation.entries.map((entry, index) => {
-          const accountOffset = index === firstAccountIndex ? "ml-auto" : "";
+      <div className="flex min-w-0 flex-1 items-center gap-8">
+        <nav
+          aria-label="Primary navigation"
+          className="flex min-w-0 flex-1 items-center gap-8 overflow-hidden"
+        >
+          {navigation.entries.map((entry, index) => {
+            const accountOffset = index === firstAccountIndex ? "ml-auto" : "";
 
-          if (entry.kind === "dropdown") {
+            if (entry.kind === "dropdown") {
+              return (
+                <span key={entry.id} className={accountOffset}>
+                  {renderTrigger(entry)}
+                </span>
+              );
+            }
+
             return (
-              <span key={entry.id} className={accountOffset}>
-                {renderTrigger(entry)}
+              <span key={entry.label} className={accountOffset}>
+                {renderAction(entry)}
               </span>
             );
-          }
-
-          return (
-            <span key={entry.label} className={accountOffset}>
-              {renderAction(entry)}
-            </span>
-          );
-        })}
+          })}
+        </nav>
         {mobileOpen ? null : (
           <button
             type="button"
@@ -118,7 +120,7 @@ export default function Navbar() {
             />
           </button>
         )}
-      </nav>
+      </div>
       {mobileOpen ? (
         <>
           <div

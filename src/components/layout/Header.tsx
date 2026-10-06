@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Navbar from "../navigation/Navbar";
 
 export default function Header() {
   return (
@@ -10,12 +11,7 @@ export default function Header() {
         height={27}
         priority
       />
-      {/* Desktop navigation */}
-      <div className="flex min-w-0 flex-1 items-center" />
-      {/* Account navigation */}
-      <div className="flex items-center" />
-      {/* Mobile menu toggle */}
-      <div className="flex items-center" />
+      <Navbar />
     </header>
   );
 }
